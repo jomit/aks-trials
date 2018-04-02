@@ -80,3 +80,59 @@
 - Browse `http://EXTERNAL-IP`
 
 - `kubectl proxy`  (to see the dashboard)
+
+#### Scaling Nodes
+
+- `az aks scale -n jackaks -g akstrials --node-count 3`
+
+#### Scaling Pods
+
+- `kubectl get pods`
+
+- `kubectl scale --replicas=5 deployment/azure-vote-front`
+
+- `kubectl get pods`
+
+#### Autoscaling ([horizontal pod autoscaling](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/))
+
+- `kubectl autoscale deployment azure-vote-front --cpu-percent=50 --min=3 --max=10`
+
+- `kubectl get hpa`
+
+#### Update Application
+
+- `docker-compose up --build -d`  (update application and rebuild the images)
+
+- `az acr list -g akstrials --query "[].{acrLoginServer:loginServer}" --output table`
+
+- `docker tag azure-vote-front jomitacr.azurecr.io/azure-vote-front:v2`
+
+- `docker push jomitacr.azurecr.io/azure-vote-front:v2`
+
+- `kubectl get pod`
+
+- `kubectl set image deployment azure-vote-front azure-vote-front=jomitacr.azurecr.io/azure-vote-front:v2`
+
+- `kubectl get service azure-vote-front`
+
+#### Monitor and Log Analytics
+
+- Setup [Container Monitoring solution in Log Analytics](https://docs.microsoft.com/en-us/azure/log-analytics/log-analytics-containers) using Azure Portal
+
+- Copy the `<WORKSPACE_ID>` and `<WORKSPACE_KEY>`
+
+- `kubectl create secret generic omsagent-secret --from-literal=WSID=WORKSPACE_ID --from-literal=KEY=WORKSPACE_KEY`
+
+- `kubectl create -f oms-daemonset.yaml`
+
+- `kubectl get daemonset`
+
+- Check the OMS Portal after few minutes to see the dashboard
+
+#### Upgrade cluster
+
+- `az aks get-upgrades -n jackaks -g akstrials --output table`
+
+- `az aks upgrade -n jackaks -g akstrials --kubernetes-version 1.8.2`
+
+- `az aks show -n jackaks -g akstrials --output table`
